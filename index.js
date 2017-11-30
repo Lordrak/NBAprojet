@@ -1,8 +1,45 @@
 var express = require('express');
+var app = express();
 var nba_teams = require('./nba-teams.json');
 var bodyParser = require('body-parser');
 var fs = require('fs');
-var app = express();
+
+function _findTeam(id){
+	var team = nba_teams.find(function(pro){
+		return pro.teamId == id || pro.abbreviation == id || pro.teamName == id;
+	});
+	return team;
+}
+
+app.get('/teams/:id', function(req, res){
+	
+	var id = req.params.id;	
+	var team = _findTeam(id);
+	if(team){
+		res.status(200).send(team);
+	}
+	else{
+		res.status(404).send("Mauvais ID");
+	}
+	
+});
+
+
+app.get('/teams', function(req, res){
+	
+	res.send(nba_teams);
+});
+
+app.get('/teams/:id/players' , function(req , res){
+	var id = req.params.id;
+	var team = _findTeam(id);
+	if(team){
+		res.status(200).send(team.players);
+	}
+	else{
+		res.status(404).send("Mauvais ID");
+	}
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -27,7 +64,6 @@ app.post('/teams/:id/player', function(req, res){
 	}
 });
 
-app.listen(3000, function(){
-	console.log("Server ON");
+app.listen(3000, function(req, res){
+	console.log('weshh')
 });
-
